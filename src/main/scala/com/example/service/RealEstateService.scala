@@ -5,16 +5,44 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Flow, Source}
 import com.example.dto.RealEstate._
+import com.example.dto.RealEstateWithCovidCases
 import spray.json.{JsNumber, JsObject, _}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class RealEstateService {
+class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
+  
+  val seqRealEstateToRealEstateWithCovidCasesFlow
+  : Flow[Seq[RealEstate], Option[RealEstateWithCovidCases], NotUsed] =
+    Flow[Seq[RealEstate]]
+      .async
+      .mapConcat(identity)
+      .map { realEstate =>
+        val street = realEstate.geo.address.street
+          .flatMap(strt => Option(strt.name.toLowerCase.replace(".,'\"`?!", "")))
+        if (street.isDefined) {
+          val covidCasesForStreet = covidCasesMap.get(street.get)
+          if (covidCasesForStreet.isDefined) {
+            Option(RealEstateWithCovidCases(
+              street.get,
+              realEstate.priceSqm,
+              realEstate.updateTime,
+              realEstate.singleRealtyUrl,
+              covidCasesForStreet.get._1,
+              covidCasesForStreet.get._2)
+            )
+          }
+        }
+        Option.empty
+      }
+    .filter(_.isDefined)
+    
+  
   
   def getRealEstateRequestsSource(pages: Int): Source[HttpRequest, NotUsed] = Source.
     fromIterator(() =>
@@ -82,5 +110,5 @@ class RealEstateService {
 }
 
 object RealEstateService {
-  def apply(): RealEstateService = new RealEstateService()
+  def apply(covidCasesMap: Map[String, (Int, Set[String])]): RealEstateService = new RealEstateService(covidCasesMap)
 }
