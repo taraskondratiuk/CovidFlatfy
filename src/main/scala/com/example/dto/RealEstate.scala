@@ -1,0 +1,20 @@
+package com.example.dto
+
+import spray.json._
+
+object RealEstate extends DefaultJsonProtocol {
+  case class RealEstate(geo: Geo, priceSqm: Option[String], updateTime: Option[String], singleRealtyUrl: Option[String])
+  
+  case class Street(name: Option[String], nameFull: Option[String])
+  
+  case class Address(street: Option[Street])
+  
+  case class Geo(address: Option[Address])
+  
+  implicit val streetFormat = jsonFormat(Street, "name", "nameFull")
+  
+  implicit val addressFormat = jsonFormat(Address, "street")
+  implicit val geoFormat = jsonFormat(Geo, "address")
+  implicit val realEstateFormat = jsonFormat(RealEstate, "geo", "priceSqm", "updateTime", "singleRealtyUrl")
+}
+

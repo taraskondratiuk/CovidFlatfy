@@ -1,14 +1,12 @@
 package com.example
 
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Sink
+import com.example.dto.RealEstate.RealEstate
 import com.example.service.RealEstateService
 import org.scalatest.FunSuite
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 import scala.util.Success
-
-
 
 class RealEstateServiceTest extends FunSuite {
   implicit val system = ActorSystem()
@@ -18,13 +16,24 @@ class RealEstateServiceTest extends FunSuite {
   
   test("api call should return status 200") {
     val future = service.getFlatfyResponseFuture(1)
-    Await.result(future, Duration.Inf)
-    future.onComplete{case Success(value) => assert(value.status.isSuccess())}
+    var actual: Boolean = false
+    Thread.sleep(5000)
+    future.onComplete{case Success(value) => actual = value.status.isSuccess()}
+    assert(actual)
   }
-  
+
   test("countNumOfPages should return int num of pages") {
     val numOfPages = service.countNumOfPages()
     assert(numOfPages.isInstanceOf[Int])
     assert(numOfPages > 1000)
+  }
+  
+  test("getFutureOfRealEstateSource should return valid source") {
+    val realEstateList = service.getRealEstateRequestsSource(5).mapAsyncUnordered(8)(service.parseRequestIntoSeqOfRealEstate).runWith(Sink.seq[Seq[RealEstate]])
+    var actual: Seq[Seq[RealEstate]] = null
+    realEstateList.onComplete{x => actual = x.get}
+    Thread.sleep(5000)
+    assert(actual.size == 5)
+    assert(actual.head.size == 30)
   }
 }
