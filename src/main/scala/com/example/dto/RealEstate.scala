@@ -3,13 +3,13 @@ package com.example.dto
 import spray.json._
 
 object RealEstate extends DefaultJsonProtocol {
-  case class RealEstate(geo: Geo, priceSqm: String, updateTime: String, singleRealtyUrl: String)
+  case class RealEstate(geo: Option[Geo], priceSqm: Option[String], updateTime: Option[String], singleRealtyUrl: Option[String])
   
-  case class Street(name: String, nameFull: String)
+  case class Street(name: Option[String], nameFull: Option[String])
   
   case class Address(street: Option[Street])
   
-  case class Geo(address: Address)
+  case class Geo(address: Option[Address])
   
   implicit val streetFormat = jsonFormat(Street, "name", "nameFull")
   

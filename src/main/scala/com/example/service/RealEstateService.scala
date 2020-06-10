@@ -5,7 +5,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.{Flow, Source}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.example.dto.RealEstate._
 import com.example.dto.RealEstateWithCovidCases
 import spray.json.{JsNumber, JsObject, _}
@@ -18,38 +18,57 @@ class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
   implicit val executionContext = system.dispatcher
   
   val seqRealEstateToRealEstateWithCovidCasesFlow
-  : Flow[Seq[RealEstate], Option[RealEstateWithCovidCases], NotUsed] =
+  : Flow[Seq[RealEstate], RealEstateWithCovidCases, NotUsed] =
     Flow[Seq[RealEstate]]
       .async
       .mapConcat(identity)
+      .filter(realEstate =>
+        realEstate.geo.isDefined &&
+          realEstate.geo.get.address.isDefined &&
+          realEstate.geo.get.address.get.street.isDefined &&
+          realEstate.geo.get.address.get.street.get.name.isDefined &&
+          realEstate.updateTime.isDefined &&
+          realEstate.singleRealtyUrl.isDefined &&
+          realEstate.priceSqm.isDefined
+      )
       .map { realEstate =>
-        val street = realEstate.geo.address.street
-          .flatMap(strt => Option(strt.name.toLowerCase.replace(".,'\"`?!", "")))
-        if (street.isDefined) {
-          val covidCasesForStreet = covidCasesMap.get(street.get)
-          if (covidCasesForStreet.isDefined) {
-            Option(RealEstateWithCovidCases(
-              street.get,
-              realEstate.priceSqm,
-              realEstate.updateTime,
-              realEstate.singleRealtyUrl,
-              covidCasesForStreet.get._1,
-              covidCasesForStreet.get._2)
-            )
-          }
+        val street = realEstate.geo.get.address.get.street.get.name.get.toLowerCase.replace(".,'\"`?!", "")
+        
+        val covidCasesForStreet = covidCasesMap.get(street)
+        if (covidCasesForStreet.isDefined) {
+          Option(RealEstateWithCovidCases(
+            street,
+            realEstate.priceSqm.get,
+            realEstate.updateTime.get,
+            realEstate.singleRealtyUrl.get,
+            covidCasesForStreet.get._1,
+            covidCasesForStreet.get._2)
+          )
         }
         Option.empty
       }
-    .filter(_.isDefined)
-    
+      .filter(_.isDefined)
+      .map(_.get)
   
+  def getTopTenRealEstateWithCovidCasesByPriceSqm: Seq[RealEstateWithCovidCases] = {
+    val seqFuture = getRealEstateRequestsSource(countNumOfPages())
+      .mapAsyncUnordered(1)(parseRequestIntoSeqOfRealEstate) //fixme exception if parallelism > 1
+      .via(seqRealEstateToRealEstateWithCovidCasesFlow)
+      .runWith(Sink.seq[RealEstateWithCovidCases])
+    
+    val sortedSeqFuture = seqFuture.map(seq => seq.sortBy(_.priceSqm).take(10))
+    
+    Await.result(sortedSeqFuture, Duration.Inf)
+    
+    sortedSeqFuture.value.get.get
+  }
   
   def getRealEstateRequestsSource(pages: Int): Source[HttpRequest, NotUsed] = Source.
     fromIterator(() =>
       Range(1, pages + 1).map(i => flatfyRequest(i)).iterator
     )
   
-  def parseRequestIntoSeqOfRealEstate(req: HttpRequest): Future[Seq[RealEstate]] =
+  def parseRequestIntoSeqOfRealEstate(req: HttpRequest): Future[Seq[RealEstate]] = {
     Http()
       .singleRequest(req)
       .flatMap(response =>
@@ -66,6 +85,7 @@ class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
               .convertTo[Seq[RealEstate]]
           }
       )
+  }
   
   def countNumOfPages(): Int = {
     val responseFuture = getFlatfyResponseFuture(1)
@@ -104,7 +124,9 @@ class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
   private def flatfyRequestBody(page: Int): JsObject = JsObject(
     "searchParams" -> JsObject(
       "city" -> JsNumber(1),
-      "page" -> JsNumber(page)
+      "page" -> JsNumber(page),
+      "realtyType" -> JsNumber(1),
+      "contractType" -> JsNumber(1)
     )
   )
 }
