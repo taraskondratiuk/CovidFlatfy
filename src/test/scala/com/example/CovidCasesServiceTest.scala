@@ -8,7 +8,7 @@ class CovidCasesServiceTest extends FunSuite {
   
   test("FileDownloader should download file without exceptions") {
     val fileDownloader = FileDownloader()
-    fileDownloader.downloadFile(sys.env("COVID_DATA_URL"), sys.env("COVID_DATA_PATH"))
+    fileDownloader.downloadFile(sys.env("COVID_DATA_URL"), sys.env("PROJECT_PATH") + "\\data\\data.csv")
   }
   
   
@@ -16,11 +16,11 @@ class CovidCasesServiceTest extends FunSuite {
     val service = CovidCasesService()
     
     val actual: Map[String, (Int, Set[String])] =
-      service.getKyivCovidCasesMap(sys.env("PROJECT_PATH") + "src\\test\\testdata.csv")
-    
+      service.getKyivCovidCasesMap(sys.env("PROJECT_PATH") + "\\src\\test\\testdata.csv")
+
     val expected: Map[String, (Int, Set[String])] = Map(
-      "вул богатирська" -> (4, Set("30.03.2020 0:00:00", "31.03.2020 0:00:00")),
-      "вул порика" -> (1, Set("31.03.2020 0:00:00"))
+      "богатирська" -> (4, Set("30.03.2020 0:00:00", "31.03.2020 0:00:00")),
+      "порика" -> (1, Set("31.03.2020 0:00:00"))
     )
     assert(actual.toSet diff expected.toSet isEmpty)
   }
