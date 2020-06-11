@@ -2,7 +2,7 @@ package com.example.dto
 
 import spray.json._
 
-object RealEstate extends DefaultJsonProtocol {
+object RealEstateFromJson extends DefaultJsonProtocol {
   case class RealEstate(geo: Option[Geo], priceSqm: Option[String], updateTime: Option[String], singleRealtyUrl: Option[String])
   
   case class Street(name: Option[String], nameFull: Option[String])

@@ -1,16 +1,21 @@
 package com.example.service
 
+import java.io.File
+
 import com.example.utility.FileDownloader
 import org.scalatest.FunSuite
 
 import scala.collection.mutable
 import scala.language.postfixOps
 
-class CovidCasesServiceTest extends FunSuite {
+class CovidCasesServiceTest extends FunSuite with FileDownloader {
   
-  test("FileDownloader should download file without exceptions") {
-    val fileDownloader = FileDownloader()
-    fileDownloader.downloadFile(sys.env("COVID_DATA_URI"), sys.env("PROJECT_PATH") + "\\data\\data.csv")
+  test("FileDownloader should download file") {
+    val path = sys.env("PROJECT_PATH") + "\\data\\data.csv"
+    new File(path).delete()
+    
+    downloadFile(sys.env("COVID_DATA_URI"), path)
+    assert(new File(path).exists())
   }
   
   

@@ -6,7 +6,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import com.example.dto.RealEstate._
+import com.example.dto.RealEstateFromJson._
 import com.example.dto.RealEstateWithCovidCases
 import spray.json.{JsNumber, JsObject, _}
 import akka.stream.ActorAttributes.supervisionStrategy

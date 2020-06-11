@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
 import akka.stream.scaladsl.Sink
-import com.example.dto.RealEstate.RealEstate
+import com.example.dto.RealEstateFromJson.RealEstate
 import com.example.dto.RealEstateWithCovidCases
 import org.scalatest.FunSuite
 
