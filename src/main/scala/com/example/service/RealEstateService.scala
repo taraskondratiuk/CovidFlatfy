@@ -9,7 +9,8 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.example.dto.RealEstate._
 import com.example.dto.RealEstateWithCovidCases
 import spray.json.{JsNumber, JsObject, _}
-
+import akka.stream.ActorAttributes.supervisionStrategy
+import akka.stream.Supervision.resumingDecider
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
@@ -32,7 +33,10 @@ class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
           realEstate.priceSqm.isDefined
       )
       .map { realEstate =>
-        val street = realEstate.geo.get.address.get.street.get.name.get.toLowerCase.replace(".,'\"`?!", "")
+        val street = realEstate.geo.get.address.get.street.get.name.get
+          .toLowerCase
+          .replaceAll("вул|пр-т|пров|шосе|б-р|просп|пр|\\.|", "")
+          .trim
         
         val covidCasesForStreet = covidCasesMap.get(street)
         if (covidCasesForStreet.isDefined) {
@@ -50,9 +54,10 @@ class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
       .filter(_.isDefined)
       .map(_.get)
   
-  def getTopTenRealEstateWithCovidCasesByPriceSqm: Seq[RealEstateWithCovidCases] = {
-    val seqFuture = getRealEstateRequestsSource(countNumOfPages())
-      .mapAsyncUnordered(1)(parseRequestIntoSeqOfRealEstate) //fixme exception if parallelism > 1
+  def getTopTenRealEstateWithCovidCasesByPriceSqm(numPages: Int = countNumOfPages(), parallelism: Int = 1): Seq[RealEstateWithCovidCases] = {
+    val seqFuture = getRealEstateRequestsSource(numPages)
+      .mapAsyncUnordered(parallelism)(parseRequestIntoSeqOfRealEstate) //fixme exception if parallelism > 1
+      .withAttributes(supervisionStrategy(resumingDecider))
       .via(seqRealEstateToRealEstateWithCovidCasesFlow)
       .runWith(Sink.seq[RealEstateWithCovidCases])
     
