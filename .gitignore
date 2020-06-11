@@ -12,5 +12,7 @@ project/plugins/project/
 .lib/
 project/project
 project/target
+
 data/*
 !data/.gitkeep
+src/test/resources/jobtestdata.csv
