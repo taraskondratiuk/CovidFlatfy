@@ -14,7 +14,7 @@ import akka.stream.Supervision.resumingDecider
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
+class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]) {
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
   
@@ -137,5 +137,6 @@ class RealEstateService(val covidCasesMap: Map[String, (Int, Set[String])]) {
 }
 
 object RealEstateService {
-  def apply(covidCasesMap: Map[String, (Int, Set[String])]): RealEstateService = new RealEstateService(covidCasesMap)
+  def apply(covidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]): RealEstateService =
+    new RealEstateService(covidCasesMap)
 }

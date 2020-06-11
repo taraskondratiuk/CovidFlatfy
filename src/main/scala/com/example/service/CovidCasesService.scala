@@ -4,19 +4,19 @@ import com.example.dto.CovidCase
 
 import scala.io.Source
 
-class CovidCasesService {
-  def getKyivCovidCasesMap(covidDataFile: String): Map[String, (Int, Set[String])] = {
+class CovidCasesService(val kyivCovidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]) {
+  def refreshMap(covidDataFile: String): Unit = {
     val src = Source.fromFile(covidDataFile)
-    src
+    val newMap = src
       .getLines()
       .drop(1)
       .map(_.split("\",\""))
       .filter(_.length >= 5)
-      .filter(_(4) == "м.Київ")
-      .map{ arr =>
+      .filter(_ (4) == "м.Київ")
+      .map { arr =>
         val street = arr(3).toLowerCase.split(",")
           .find(text => text.matches(".*(вул|пр-т|пров|шосе|б-р|просп|пр).*"))
-        if (street.isDefined){
+        if (street.isDefined) {
           Option(CovidCase(street.get
             .replaceAll("вул|пр-т|пров|шосе|б-р|просп|пр|\\.|", "").trim, arr(5)))
         } else Option.empty
@@ -29,9 +29,13 @@ class CovidCasesService {
       .view
       .mapValues(list => (list.length, list.toSet))
       .toMap
+    kyivCovidCasesMap ++ newMap
   }
 }
 
 object CovidCasesService {
-  def apply(): CovidCasesService = new CovidCasesService()
+  def apply(
+             kyivCovidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])] =
+             scala.collection.concurrent.TrieMap[String, (Int, Set[String])]()
+           ): CovidCasesService = new CovidCasesService(kyivCovidCasesMap)
 }

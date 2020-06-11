@@ -1,3 +1,16 @@
 *.class
 .idea
 target/
+*.log
+dist/*
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+project/project
+project/target
+data/*
+!data/.gitkeep
