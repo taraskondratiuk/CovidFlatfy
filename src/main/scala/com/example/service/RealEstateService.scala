@@ -1,5 +1,7 @@
 package com.example.service
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -11,8 +13,11 @@ import com.example.dto.RealEstateWithCovidCases
 import spray.json.{JsNumber, JsObject, _}
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
+import scala.concurrent.duration._
 
 class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]) {
   implicit val system = ActorSystem()
@@ -48,14 +53,18 @@ class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[Strin
             covidCasesForStreet.get._1,
             covidCasesForStreet.get._2)
           )
+        } else {
+          Option.empty
         }
-        Option.empty
       }
       .filter(_.isDefined)
       .map(_.get)
   
-  def getTopTenRealEstateWithCovidCasesByPriceSqm(numPages: Int = countNumOfPages(), parallelism: Int = 1): Seq[RealEstateWithCovidCases] = {
+  def getTopTenRealEstateWithCovidCasesByPriceSqm(numPages: Int = countNumOfPages(),
+                                                  parallelism: Int = 1,
+                                                  throttle: Int = 1): Seq[RealEstateWithCovidCases] = {
     val seqFuture = getRealEstateRequestsSource(numPages)
+      .throttle(1, throttle millis)
       .mapAsyncUnordered(parallelism)(parseRequestIntoSeqOfRealEstate) //fixme exception if parallelism > 1
       .withAttributes(supervisionStrategy(resumingDecider))
       .via(seqRealEstateToRealEstateWithCovidCasesFlow)
