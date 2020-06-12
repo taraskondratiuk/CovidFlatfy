@@ -1,4 +1,4 @@
-package com.example.dto
+package main.scala.com.example.model
 
 import spray.json._
 

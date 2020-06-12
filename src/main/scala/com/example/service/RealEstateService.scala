@@ -1,4 +1,4 @@
-package com.example.service
+package main.scala.com.example.service
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -7,26 +7,28 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.{Flow, Sink, Source}
-import com.example.dto.RealEstateFromJson._
-import com.example.dto.RealEstateWithCovidCases
-import spray.json.{JsNumber, JsObject, _}
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import main.scala.com.example.model.RealEstateFromJson.RealEstate
+import main.scala.com.example.model.RealEstateWithCovidCases
+import spray.json._
+import main.scala.com.example.model.RealEstateFromJson._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
-import scala.concurrent.duration._
 
 class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]) {
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
+  val atomic = new AtomicInteger()
   
   val seqRealEstateToRealEstateWithCovidCasesFlow
   : Flow[Seq[RealEstate], RealEstateWithCovidCases, NotUsed] =
     Flow[Seq[RealEstate]]
       .async
+      .map { x => atomic.incrementAndGet(); x }
       .mapConcat(identity)
       .filter(realEstate =>
         realEstate.geo.isDefined &&
@@ -64,7 +66,7 @@ class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[Strin
                                                   parallelism: Int = 1,
                                                   throttle: Int = 1): Seq[RealEstateWithCovidCases] = {
     val seqFuture = getRealEstateRequestsSource(numPages)
-      .throttle(1, throttle millis)
+      //      .throttle(1, throttle millis)
       .mapAsyncUnordered(parallelism)(parseRequestIntoSeqOfRealEstate) //fixme exception if parallelism > 1
       .withAttributes(supervisionStrategy(resumingDecider))
       .via(seqRealEstateToRealEstateWithCovidCasesFlow)
@@ -73,7 +75,8 @@ class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[Strin
     val sortedSeqFuture = seqFuture.map(seq => seq.sortBy(_.priceSqm).take(10))
     
     Await.result(sortedSeqFuture, Duration.Inf)
-    
+    println(s"${atomic.get()} pages processed successfully")
+    atomic.set(0)
     sortedSeqFuture.value.get.get
   }
   
@@ -120,7 +123,6 @@ class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[Strin
               }
           }
       }
-      //todo add logging for failure
     }
     Await.result(numOfPagesFuture, Duration.Inf)
   }

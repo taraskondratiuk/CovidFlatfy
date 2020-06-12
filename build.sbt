@@ -1,8 +1,8 @@
 lazy val akkaHttpVersion = "10.1.12"
 lazy val akkaVersion    = "2.6.5"
 
-lazy val root = (project in file(".")).
-  settings(
+lazy val root = (project in file("."))
+  .settings(
     inThisBuild(List(
       organization    := "com.example",
       scalaVersion    := "2.13.1"
@@ -16,9 +16,8 @@ lazy val root = (project in file(".")).
       "ch.qos.logback"    % "logback-classic"           % "1.2.3",
       "com.enragedginger" %% "akka-quartz-scheduler"    % "1.8.4-akka-2.6.x",
       "redis.clients"     % "jedis"                     % "3.3.0",
-      
-      "com.typesafe.akka" %% "akka-http-testkit"        % akkaHttpVersion % Test,
-      "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion     % Test,
-      "org.scalatest"     %% "scalatest"                % "3.0.8"         % Test
+
+      "org.scalactic" %% "scalactic" % "3.0.8",
+      "org.scalatest" %% "scalatest" % "3.0.8"
     )
   )

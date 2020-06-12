@@ -1,4 +1,4 @@
-package com.example.utility
+package main.scala.com.example.utility
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 

@@ -1,10 +1,11 @@
-package com.example.service
+package main.scala.com.example.service
 
-import com.example.dto.CovidCase
+import main.scala.com.example.model.CovidCase
 
 import scala.io.Source
 
-class CovidCasesService(val kyivCovidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]) {
+class CovidCasesService(val kyivCovidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]
+                        = scala.collection.concurrent.TrieMap[String, (Int, Set[String])]()) {
   def refreshMap(covidDataFile: String): Unit = {
     val src = Source.fromFile(covidDataFile)
     val newMap = src
@@ -34,8 +35,11 @@ class CovidCasesService(val kyivCovidCasesMap: scala.collection.concurrent.Map[S
 }
 
 object CovidCasesService {
-  def apply(
-             kyivCovidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])] =
-             scala.collection.concurrent.TrieMap[String, (Int, Set[String])]()
-           ): CovidCasesService = new CovidCasesService(kyivCovidCasesMap)
+  def apply(): CovidCasesService = new CovidCasesService()
+  
+  def apply(covidDataFile: String): CovidCasesService = {
+    val service = new CovidCasesService()
+    service.refreshMap(covidDataFile)
+    service
+  }
 }

@@ -1,11 +1,12 @@
-package com.example.service
+package test.scala.com.example.service
 
 import akka.actor.ActorSystem
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
 import akka.stream.scaladsl.Sink
-import com.example.dto.RealEstateFromJson.RealEstate
-import com.example.dto.RealEstateWithCovidCases
+import main.scala.com.example.model.RealEstateFromJson.RealEstate
+import main.scala.com.example.model.RealEstateWithCovidCases
+import main.scala.com.example.service.{CovidCasesService, RealEstateService}
 import org.scalatest.FunSuite
 
 import scala.concurrent.Await
@@ -52,7 +53,7 @@ class RealEstateServiceTest extends FunSuite {
   }
   
   test("getTopTenRealEstateWithCovidCasesByPriceSqm should not fall with exception") {
-    val actual = service.getTopTenRealEstateWithCovidCasesByPriceSqm(parallelism = 1, numPages = 100)
+    val actual = service.getTopTenRealEstateWithCovidCasesByPriceSqm(parallelism = 1, numPages = 200)
     assert(actual.size == 10)
   }
 }
