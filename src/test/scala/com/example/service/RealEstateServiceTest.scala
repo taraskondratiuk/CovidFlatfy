@@ -16,8 +16,9 @@ class RealEstateServiceTest extends FunSuite {
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
 
-  val service = RealEstateService(CovidCasesService().kyivCovidCasesMap)
-
+  val covidCasesService = CovidCasesService()
+  covidCasesService.refreshMap(sys.env("PROJECT_PATH") + "\\data\\data.csv")
+  val service = RealEstateService(covidCasesService.kyivCovidCasesMap)
 
   test("api call should return status 200") {
     val future = service.getFlatfyResponseFuture(1)
@@ -54,6 +55,7 @@ class RealEstateServiceTest extends FunSuite {
   }
 
   test("getTopTenRealEstateWithCovidCasesByPriceSqm should not fall with exception") {
-    val actual = service.getTopTenRealEstateWithCovidCasesByPriceSqm(parallelism = 1, numPages = 10)
+    val actual = service.getTopTenRealEstateWithCovidCasesByPriceSqm(parallelism = 1)
+    assert(actual.size == 10)
   }
 }

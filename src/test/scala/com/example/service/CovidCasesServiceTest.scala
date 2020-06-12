@@ -30,6 +30,8 @@ class CovidCasesServiceTest extends FunSuite with FileDownloader {
       "богатирська" -> (4, Set("30.03.2020 0:00:00", "31.03.2020 0:00:00")),
       "порика" -> (1, Set("31.03.2020 0:00:00"))
     )
+    
     assert(actual.toSet diff expected.toSet isEmpty)
+    assert(expected.toSet diff actual.toSet isEmpty)
   }
 }

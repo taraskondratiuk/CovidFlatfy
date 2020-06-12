@@ -29,7 +29,7 @@ class CovidCasesService(val kyivCovidCasesMap: scala.collection.concurrent.Map[S
       .view
       .mapValues(list => (list.length, list.toSet))
       .toMap
-    kyivCovidCasesMap ++ newMap
+    kyivCovidCasesMap ++= newMap
   }
 }
 
