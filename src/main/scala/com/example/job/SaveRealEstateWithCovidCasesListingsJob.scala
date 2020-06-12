@@ -10,6 +10,6 @@ class SaveRealEstateWithCovidCasesListingsJob extends Job {
     val repo = context.getScheduler.getContext.get("listingsRepo").asInstanceOf[RealEstateWihtCovidCasesListingsRepository]
     
     repo.saveListing(realEstateService.getTopTenRealEstateWithCovidCasesByPriceSqm(
-      sys.env("DEFAULT_NUM_PAGES").toInt)) //fixme change to default num of pages if long request processing time fixed
+      sys.env("NUM_PAGES").toInt)) //fixme change to default num of pages if long request processing time fixed
   }
 }

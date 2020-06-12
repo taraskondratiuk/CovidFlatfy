@@ -1,0 +1,33 @@
+version: '3'
+services:
+  covid_flatfy:
+    container_name: covid_flatfy_service
+    build: .
+    environment:
+      - DB_HOST=redis
+      - DB_PORT=6379
+      - PROJECT_PATH=/
+      - FLATFY_URI=https://flatfy.ua/api/v2/search/results_for_listing_with_map
+      - COVID_DATA_URI=https://covid19.gov.ua/csv/data.csv
+      - COVID_DATA_PATH=/data/data.csv
+      - NUM_PAGES=200
+    depends_on:
+      - redis
+    ports:
+    - "8080:8080"
+  redis:
+    container_name: redis
+    image: redis:5.0.7-alpine
+    command:
+      - 'redis-server'
+      - '--loglevel ${REDIS_LOGLEVEL:-warning}'
+      - '--databases 1'
+      - '--save 900 1'
+      - '--save 300 10'
+      - '--save 60 10000'
+      - '--maxmemory ${REDIS_MAXMEM:-50mb}'
+      - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
+    volumes:
+      - ./redisdata:/redisdata
+    ports:
+      - "6379:6379"
