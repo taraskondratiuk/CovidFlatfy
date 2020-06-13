@@ -13,15 +13,14 @@ import org.quartz.impl.StdSchedulerFactory
 import spray.json._
 
 import scala.concurrent.Future
-import scala.io.StdIn
 
 object AppController extends App with JobScheduler with FileDownloader {
   implicit val system = ActorSystem("covid-flatfy-system")
   implicit val executionContext = system.dispatcher
   
-  downloadFile("https://covid19.gov.ua/csv/data.csv", "F:\\1PROGA\\stsala\\CovidFlatfy\\data\\data.csv")
+  downloadFile(sys.env("COVID_DATA_URI"), sys.env("PROJECT_PATH") + sys.env("COVID_DATA_PATH"))
   
-  private val covidCasesService = CovidCasesService(sys.env("PROJECT_PATH" + sys.env("COVID_DATA_PATH")))
+  private val covidCasesService = CovidCasesService(sys.env("PROJECT_PATH") + sys.env("COVID_DATA_PATH"))
   private val realEstateService = RealEstateService(covidCasesService.kyivCovidCasesMap)
   private val listingsRepo = RealEstateWihtCovidCasesListingsRepository(sys.env("DB_HOST"), sys.env("DB_PORT").toInt)
   private val jobScheduler = new StdSchedulerFactory().getScheduler
@@ -56,11 +55,7 @@ object AppController extends App with JobScheduler with FileDownloader {
       complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "job started"))
     }
   }
-  val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
   
-  println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
-  StdIn.readLine() // let it run until user presses return
-  bindingFuture
-    .flatMap(_.unbind())
-    .onComplete(_ => system.terminate())
+  println(s"Server online at http://127.0.0.1:8080/")
 }
