@@ -1,17 +1,16 @@
-package main.scala.com.example.controller
+package com.example.controller
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
-import main.scala.com.example.job.{DownloadAndRefreshCovidDataJob, SaveRealEstateWithCovidCasesListingsJob}
-import main.scala.com.example.model.RealEstateWithCovidCasesProtocol._
-import main.scala.com.example.repository.RealEstateWihtCovidCasesListingsRepository
-import main.scala.com.example.service.{CovidCasesService, RealEstateService}
-import main.scala.com.example.utility.{FileDownloader, JobScheduler}
+import com.example.job.{DownloadAndRefreshCovidDataJob, SaveRealEstateWithCovidCasesListingsJob}
+import com.example.repository.RealEstateWihtCovidCasesListingsRepository
+import com.example.service.{CovidCasesService, RealEstateService}
+import com.example.utility.{FileDownloader, JobScheduler}
 import org.quartz.impl.StdSchedulerFactory
 import spray.json._
-
+import com.example.model.RealEstateWithCovidCasesProtocol._
 import scala.concurrent.Future
 
 object AppController extends App with JobScheduler with FileDownloader {

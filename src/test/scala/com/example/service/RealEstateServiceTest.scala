@@ -1,12 +1,11 @@
-package test.scala.com.example.service
+package com.example.service
 
 import akka.actor.ActorSystem
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
 import akka.stream.scaladsl.Sink
-import main.scala.com.example.model.RealEstateFromJson.RealEstate
-import main.scala.com.example.model.RealEstateWithCovidCases
-import main.scala.com.example.service.{CovidCasesService, RealEstateService}
+import com.example.model.RealEstateFromJson.RealEstate
+import com.example.model.RealEstateWithCovidCases
 import org.scalatest.FunSuite
 
 import scala.concurrent.Await

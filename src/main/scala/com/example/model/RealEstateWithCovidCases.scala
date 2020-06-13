@@ -1,4 +1,4 @@
-package main.scala.com.example.model
+package com.example.model
 
 import spray.json.DefaultJsonProtocol
 

@@ -1,6 +1,6 @@
-package main.scala.com.example.service
+package com.example.service
 
-import main.scala.com.example.model.CovidCase
+import com.example.model.CovidCase
 
 import scala.io.Source
 

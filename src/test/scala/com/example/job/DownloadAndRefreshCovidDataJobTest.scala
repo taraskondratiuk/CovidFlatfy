@@ -1,9 +1,8 @@
-package test.scala.com.example.job
+package com.example.job
 
 import java.io.File
 
-import main.scala.com.example.job.DownloadAndRefreshCovidDataJob
-import main.scala.com.example.service.CovidCasesService
+import com.example.service.CovidCasesService
 import org.quartz._
 import org.quartz.impl.StdSchedulerFactory
 import org.scalatest.FunSuite

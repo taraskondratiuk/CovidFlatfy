@@ -1,7 +1,7 @@
-package main.scala.com.example.job
+package com.example.job
 
-import main.scala.com.example.service.CovidCasesService
-import main.scala.com.example.utility.FileDownloader
+import com.example.service.CovidCasesService
+import com.example.utility.FileDownloader
 import org.quartz.{Job, JobExecutionContext}
 
 class DownloadAndRefreshCovidDataJob extends Job with FileDownloader {

@@ -1,4 +1,4 @@
-package main.scala.com.example.service
+package com.example.service
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -10,10 +10,10 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import main.scala.com.example.model.RealEstateFromJson.RealEstate
-import main.scala.com.example.model.RealEstateWithCovidCases
+import com.example.model.RealEstateFromJson.RealEstate
+import com.example.model.RealEstateWithCovidCases
 import spray.json._
-import main.scala.com.example.model.RealEstateFromJson._
+import com.example.model.RealEstateFromJson._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

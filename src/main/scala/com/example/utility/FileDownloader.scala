@@ -1,4 +1,4 @@
-package main.scala.com.example.utility
+package com.example.utility
 
 trait FileDownloader {
   def downloadFile(fileUrl: String, outputPath: String): Unit = {

@@ -1,10 +1,10 @@
-package main.scala.com.example.repository
+package com.example.repository
 
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import main.scala.com.example.model.RealEstateWithCovidCases
-import main.scala.com.example.utility.Serializer
+import com.example.model.RealEstateWithCovidCases
+import com.example.utility.Serializer
 import redis.clients.jedis.Jedis
 
 
@@ -29,7 +29,7 @@ class RealEstateWihtCovidCasesListingsRepository(val host: String, val port: Int
   
   def getLastListing(): (String, Seq[RealEstateWithCovidCases]) = {
     val lastKey = r.get("lastKey")
-    if (!lastKey.isEmpty) {
+    if (lastKey != null) {
       (lastKey, deserialize(r.get(lastKey.getBytes)).asInstanceOf[Seq[RealEstateWithCovidCases]])
     } else ("", Seq())
   }

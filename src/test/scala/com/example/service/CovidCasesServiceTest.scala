@@ -1,9 +1,8 @@
-package test.scala.com.example.service
+package com.example.service
 
 import java.io.File
 
-import main.scala.com.example.service.CovidCasesService
-import main.scala.com.example.utility.FileDownloader
+import com.example.utility.FileDownloader
 import org.scalatest.FunSuite
 
 import scala.collection.mutable

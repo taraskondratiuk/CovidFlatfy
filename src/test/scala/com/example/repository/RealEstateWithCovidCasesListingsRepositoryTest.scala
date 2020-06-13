@@ -1,10 +1,9 @@
-package test.scala.com.example.repository
+package com.example.repository
 
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import main.scala.com.example.model.RealEstateWithCovidCases
-import main.scala.com.example.repository.RealEstateWihtCovidCasesListingsRepository
+import com.example.model.RealEstateWithCovidCases
 import org.scalatest.FunSuite
 
 class RealEstateWithCovidCasesListingsRepositoryTest extends FunSuite {

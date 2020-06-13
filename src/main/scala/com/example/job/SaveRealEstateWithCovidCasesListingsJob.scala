@@ -1,7 +1,7 @@
-package main.scala.com.example.job
+package com.example.job
 
-import main.scala.com.example.repository.RealEstateWihtCovidCasesListingsRepository
-import main.scala.com.example.service.RealEstateService
+import com.example.repository.RealEstateWihtCovidCasesListingsRepository
+import com.example.service.RealEstateService
 import org.quartz.{Job, JobExecutionContext}
 
 class SaveRealEstateWithCovidCasesListingsJob extends Job {
