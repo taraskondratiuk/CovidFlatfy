@@ -9,8 +9,8 @@ Top 10 listing is saved every hour and on demand
 
 Available endpoints:
 
-POST 127.0.0.1:8080/run - start job that joins covid cases 
+POST 127.0.0.1:3427/run - start job that joins covid cases 
 
-GET 127.0.0.1:8080/last - get last listing
+GET 127.0.0.1:3427/last - get last listing
 
-GET 127.0.0.1:8080/today - get listings for today
+GET 127.0.0.1:3427/today - get listings for today

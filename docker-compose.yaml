@@ -14,7 +14,7 @@ services:
     depends_on:
       - redis
     ports:
-    - "8080:8080"
+    - "3427:8080"
   redis:
     container_name: redis
     image: redis:5.0.7-alpine
