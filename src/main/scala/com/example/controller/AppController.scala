@@ -2,6 +2,7 @@ package com.example.controller
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import com.example.job.{DownloadAndRefreshCovidDataJob, SaveRealEstateWithCovidCasesListingsJob}
@@ -11,6 +12,8 @@ import com.example.utility.{FileDownloader, JobScheduler}
 import org.quartz.impl.StdSchedulerFactory
 import spray.json._
 import com.example.model.RealEstateWithCovidCasesProtocol._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import spray.json.DefaultJsonProtocol._
 import scala.concurrent.Future
 
 object AppController extends App with JobScheduler with FileDownloader {
@@ -23,7 +26,6 @@ object AppController extends App with JobScheduler with FileDownloader {
   private val realEstateService = RealEstateService(covidCasesService.kyivCovidCasesMap)
   private val listingsRepo = RealEstateWihtCovidCasesListingsRepository(sys.env("DB_HOST"), sys.env("DB_PORT").toInt)
   private val jobScheduler = new StdSchedulerFactory().getScheduler
-
   jobScheduler.getContext.put("covidCasesService", covidCasesService)
   jobScheduler.getContext.put("realEstateService", realEstateService)
   jobScheduler.getContext.put("listingsRepo", listingsRepo)
@@ -40,12 +42,20 @@ object AppController extends App with JobScheduler with FileDownloader {
   val route =
     path("last") {
       get {
-        complete(HttpEntity(ContentTypes.`application/json`, listingsRepo.getLastListing().toJson.compactPrint))
+        complete {
+          ToResponseMarshallable {
+            listingsRepo.getLastListing()
+          }
+        }
       }
     } ~
       path("today") {
         get {
-          complete(HttpEntity(ContentTypes.`application/json`, listingsRepo.getThisDayListings().toJson.compactPrint))
+          complete {
+            ToResponseMarshallable {
+              listingsRepo.getThisDayListings()
+            }
+          }
         }
       } ~
   path("run") {

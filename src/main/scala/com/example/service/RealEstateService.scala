@@ -1,13 +1,13 @@
 package com.example.service
 
 import java.util.concurrent.atomic.AtomicInteger
-
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorAttributes.supervisionStrategy
+import akka.stream.Materializer
 import akka.stream.Supervision.resumingDecider
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.example.model.RealEstateFromJson.RealEstate
@@ -22,6 +22,7 @@ import scala.language.postfixOps
 class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]) {
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
+//  implicit val mat        = new Materializer()
   val atomic = new AtomicInteger()
   
   val seqRealEstateToRealEstateWithCovidCasesFlow

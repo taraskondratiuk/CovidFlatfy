@@ -11,7 +11,7 @@ import scala.language.postfixOps
 class CovidCasesServiceTest extends FunSuite with FileDownloader {
   
   test("FileDownloader should download file") {
-    val path = sys.env("PROJECT_PATH") + "\\data\\data.csv"
+    val path = sys.env("PROJECT_PATH") + "/data/data.csv"
     new File(path).delete()
     
     downloadFile(sys.env("COVID_DATA_URI"), path)
@@ -21,7 +21,7 @@ class CovidCasesServiceTest extends FunSuite with FileDownloader {
   
   test("CovidCasesService should return valid result") {
     val service = CovidCasesService()
-    service.refreshMap(sys.env("PROJECT_PATH") + "\\src\\test\\resources\\testdata.csv")
+    service.refreshMap(sys.env("PROJECT_PATH") + "/src/test/resources/testdata.csv")
     
     val actual: mutable.Map[String, (Int, Set[String])] =
       service.kyivCovidCasesMap

@@ -9,8 +9,8 @@ import org.scalatest.FunSuite
 
 class DownloadAndRefreshCovidDataJobTest extends FunSuite {
   test("job should download file") {
-    val path = sys.env("PROJECT_PATH") + "\\src\\test\\resources\\jobtestdata.csv"
-    
+    val path = sys.env("PROJECT_PATH") + "/src/test/resources/jobtestdata.csv"
+
     new File(path).delete()
     val job = JobBuilder.newJob(classOf[DownloadAndRefreshCovidDataJob]).withIdentity("Job", "Group")
     val jobDataMap = new JobDataMap()

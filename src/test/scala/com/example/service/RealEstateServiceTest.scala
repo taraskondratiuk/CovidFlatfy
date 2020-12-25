@@ -4,19 +4,24 @@ import akka.actor.ActorSystem
 import akka.stream.ActorAttributes.supervisionStrategy
 import akka.stream.Supervision.resumingDecider
 import akka.stream.scaladsl.Sink
+import com.example.controller.AppController.downloadFile
 import com.example.model.RealEstateFromJson.RealEstate
 import com.example.model.RealEstateWithCovidCases
 import org.scalatest.FunSuite
 
+import java.io.File
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class RealEstateServiceTest extends FunSuite {
   implicit val system = ActorSystem()
   implicit val executionContext = system.dispatcher
-  
+  val path = sys.env("PROJECT_PATH") + "/data/data.csv"
+  new File(path).delete()
+
+  downloadFile(sys.env("COVID_DATA_URI"), path)
   val covidCasesService = CovidCasesService()
-  covidCasesService.refreshMap(sys.env("PROJECT_PATH") + "\\data\\data.csv")
+  covidCasesService.refreshMap(sys.env("PROJECT_PATH") + "/data/data.csv")
   val service = RealEstateService(covidCasesService.kyivCovidCasesMap)
   
   test("api call should return status 200") {

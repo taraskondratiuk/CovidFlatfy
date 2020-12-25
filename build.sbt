@@ -17,7 +17,8 @@ lazy val root = (project in file("."))
       "com.enragedginger" %% "akka-quartz-scheduler"    % "1.8.4-akka-2.6.x",
       "redis.clients"     % "jedis"                     % "3.3.0",
 
-      "org.scalactic" %% "scalactic" % "3.0.8",
-      "org.scalatest" %% "scalatest" % "3.0.8"
-    )
+      "org.scalactic"     %% "scalactic"                % "3.0.8" % Test,
+      "org.scalatest"     %% "scalatest"                % "3.0.8" % Test
+    ),
+    parallelExecution in Test := false
   )
