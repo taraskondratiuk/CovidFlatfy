@@ -1,0 +1,78 @@
+swagger: '2.0'
+info:
+  version: 0.1.0
+  description: covidFlatfy
+  title: CovidFlatfyService
+host: localhost:3427
+basePath: /
+schemes:
+  - https
+consumes:
+  - text/plain; charset=utf-8
+produces:
+  - application/json
+tags:
+  - name: covidFlatfy
+    description: covidFlatfy service endpoints
+paths:
+  /last:
+    get:
+      operationId: getLastCovidFlatfyRecord
+      tags:
+        - covidFlatfy
+      description: Gets last CovidFlatfy record
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/CovidFlatfyResponse'
+  /run:
+    post:
+      operationId: runJob
+      tags:
+        - covidFlatfy
+      description: runs job to join covid data with flatfy response
+      responses:
+        '200':
+          description: Successful response
+  /today:
+    get:
+      operationId: getTodayCovidFlatfyRecords
+      tags:
+        - covidFlatfy
+      description: Gets today CovidFlatfy records
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CovidFlatfyResponse'
+
+definitions:
+  CovidFlatfyResponse:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/RealEstateWithCovidCases'
+      date:
+        type: string
+  RealEstateWithCovidCases:
+    type: object
+    properties:
+      street:
+        type: string
+      priceSqm:
+        type: string
+      updateDate:
+        type: string
+      singleRealtyUrl:
+        type: string
+      numCases:
+        type: integer
+      casesDates:
+        type: array
+        items:
+          type: string
