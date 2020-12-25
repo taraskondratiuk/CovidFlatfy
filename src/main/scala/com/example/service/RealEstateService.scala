@@ -62,7 +62,14 @@ class RealEstateService(val covidCasesMap: scala.collection.concurrent.Map[Strin
       }
       .filter(_.isDefined)
       .map(_.get)
-  
+
+  /**
+   * getting top ten cheapest flats in covid places fetched from flatfy api
+   * @param numPages num of pages to be processed from flatfy api
+   * @param parallelism parallelism level, due to bug works correctly only with 1
+   * @param throttle throttling between requests to api in millis, turned off for now
+   * @return
+   */
   def getTopTenRealEstateWithCovidCasesByPriceSqm(numPages: Int = countNumOfPages(),
                                                   parallelism: Int = 1,
                                                   throttle: Int = 1): Seq[RealEstateWithCovidCases] = {

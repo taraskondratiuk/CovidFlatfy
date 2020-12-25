@@ -10,11 +10,12 @@ import com.example.repository.RealEstateWihtCovidCasesListingsRepository
 import com.example.service.{CovidCasesService, RealEstateService}
 import com.example.utility.{FileDownloader, JobScheduler}
 import org.quartz.impl.StdSchedulerFactory
-import spray.json._
 import com.example.model.RealEstateWithCovidCasesProtocol._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import spray.json.DefaultJsonProtocol._
+import akka.stream.Materializer
+
 import scala.concurrent.Future
+import spray.json.DefaultJsonProtocol._
 
 object AppController extends App with JobScheduler with FileDownloader {
   implicit val system = ActorSystem("covid-flatfy-system")
@@ -49,15 +50,15 @@ object AppController extends App with JobScheduler with FileDownloader {
         }
       }
     } ~
-      path("today") {
-        get {
-          complete {
-            ToResponseMarshallable {
-              listingsRepo.getThisDayListings()
-            }
-          }
-        }
-      } ~
+//      path("today") {
+//        get {
+//          complete {
+//            ToResponseMarshallable {
+//              listingsRepo.getThisDayListings()
+//            }
+//          }
+//        }
+//      } ~
   path("run") {
     post {
       Future(listingsRepo.saveListing(realEstateService.getTopTenRealEstateWithCovidCasesByPriceSqm(numPages = sys.env("NUM_PAGES").toInt)))

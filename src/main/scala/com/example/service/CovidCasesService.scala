@@ -6,6 +6,10 @@ import scala.io.Source
 
 class CovidCasesService(val kyivCovidCasesMap: scala.collection.concurrent.Map[String, (Int, Set[String])]
                         = scala.collection.concurrent.TrieMap[String, (Int, Set[String])]()) {
+  /**
+   * method that refreshes in-memory map by reading covid cases data from given local csv  file
+   * @param covidDataFile file path of local csv file with covid data
+   */
   def refreshMap(covidDataFile: String): Unit = {
     val src = Source.fromFile(covidDataFile)
     val newMap = src
